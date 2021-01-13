@@ -48,7 +48,7 @@ namespace s3805825_a1.Managers
             //command.Parameters.AddWithValue("tranID", GetTransactionID());
             command.Parameters.AddWithValue("type", word);
             command.Parameters.AddWithValue("from", acc.AccountNumber);
-            command.Parameters.AddWithValue("to", IfNull(acc.AccountNumber));
+            command.Parameters.AddWithValue("to", DBNull.Value);
             command.Parameters.AddWithValue("amount", acc.Balance);
             command.Parameters.AddWithValue("comment", "");
             DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
@@ -57,35 +57,8 @@ namespace s3805825_a1.Managers
             
             command.ExecuteNonQuery();
         }
-        object IfNull(object ob)
-        {
-            if (ob == null)
-                return DBNull.Value;
-
-            return ob;
-        }
-        public int GetTransactionID()
-        {
-            using var connection = _connectionString.CreateConnection();
-            var command = connection.CreateCommand();
-            command.CommandText = "select TransactionID from [Transaction]";
-
-            List<int> ids = (List<int>)command.ExecuteScalar();
-            if (ids == null)
-            {
-                return 0000;
-            }
-            else
-            {
-                var cr = 0;
-                foreach (var number in ids)
-                {
-                    if (number > cr)
-                        cr = number;
-
-                }
-                return cr + 1;
-            }
-        }
+        
+        
+        
     }
 }
