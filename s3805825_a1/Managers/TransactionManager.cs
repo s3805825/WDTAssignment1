@@ -20,19 +20,18 @@ namespace s3805825_a1.Managers
         {
             using var connection = _connectionString.CreateConnection();
             var command = connection.CreateCommand();
-            command.CommandText = "select * from Transaction where AccountNumber = @accID or where DestinationAccountNumber = @daccID";
+            command.CommandText = "select * from [transaction] where AccountNumber = @accID or DestinationAccountNumber = @daccID";
             command.Parameters.AddWithValue("accID", AccountNumber);
             command.Parameters.AddWithValue("daccID", AccountNumber);
 
             return command.GetDataTable().Select().Select(x => new Transactions
             {
                 TransactionID = (int)x["TransactionID"],
-                TransactionTimeUtc = (string)x["TransactionTimeUtc"],
+                TransactionTimeUtc = Convert.ToDateTime(x["TransactionTimeUtc"]).ToString("dd/MM/yyyy HH:mm:ss tt"),
                 TransactionType = (string)x["TransactionType"],
-                TransactionFrom = (string)x["AccountNumber"],
-                TransactionTo = (string)x["DestinationAccountNumber"],
+                TransactionFrom = (int)x["AccountNumber"],
                 Comment = (string)x["Comment"],
-                Amount = (double)x["Amount"]
+                Amount = (double)(decimal)x["Amount"]
             }).ToList();
         }
 

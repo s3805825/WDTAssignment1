@@ -38,13 +38,13 @@ namespace s3805825_a1.Managers
             using var connection = _connectionString.CreateConnection();
             var command = connection.CreateCommand();
             command.CommandText = "select * from Account where CustomerID = @cusID";
-            command.Parameters.AddWithValue("CustomerID", cusID);
+            command.Parameters.AddWithValue("cusID", cusID);
             var TransactionManager = new TransactionManager(_connectionString);
             return command.GetDataTable().Select().Select(x => new Account
             {
                 AccountNumber = (int)x["AccountNumber"],
                 AccountType = (String)x["AccountType"],
-                Balance = (double)x["Balance"],
+                Balance = (double)(decimal)x["Balance"],
                 Transactions = TransactionManager.GetTransaction((int)x["AccountNumber"])
             }).ToList();
         }

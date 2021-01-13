@@ -40,8 +40,7 @@ namespace s3805825_a1.Model
                     t.TransactionTimeUtc = DateTime.Now.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss tt");
                     t.Amount = amount;
                     t.TransactionID = 1;
-                    t.TransactionFrom = "";
-                    t.TransactionTo = acc.AccountNumber.ToString();
+                    t.TransactionTo = acc.AccountNumber;
                     t.TransactionType = "D";
                     t.Comment = "Deposit";
                     account.Transactions.Add(t);
@@ -64,8 +63,7 @@ namespace s3805825_a1.Model
                     t.TransactionTimeUtc = DateTime.Now.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss tt");
                     t.Amount = amount;
                     t.TransactionID = 1;
-                    t.TransactionFrom = acc.AccountNumber.ToString();
-                    t.TransactionTo = "";
+                    t.TransactionFrom = acc.AccountNumber;
                     t.TransactionType = "W";
                     t.Comment = "Withdraw";
                     account.Transactions.Add(t);
@@ -95,8 +93,8 @@ namespace s3805825_a1.Model
             }
             t.Amount = amount;
             t.TransactionID = 1;
-            t.TransactionFrom = from.AccountNumber.ToString();
-            t.TransactionTo = acc.AccountNumber.ToString();
+            t.TransactionFrom = from.AccountNumber;
+            t.TransactionTo = acc.AccountNumber;
             t.TransactionType = "T";
             t.Comment = des;
 

@@ -24,7 +24,7 @@ namespace s3805825_a1.Managers
 
             Logins = command.GetDataTable().Select().Select(x => new LoginAccount
             {
-                LoginID = (int)x["LoginID"],
+                LoginID = (string)x["LoginID"],
                 CustomerID = (int)x["CustomerID"],
                 PasswordHash = (string)x["PasswordHash"]
             }).ToList();

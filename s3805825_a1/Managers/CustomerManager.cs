@@ -22,9 +22,9 @@ namespace s3805825_a1.Managers
             {
                 CustomerID = (int)x["CustomerID"],
                 Name = (string)x["Name"],
-                Address = (string)x["Address"],
-                City = (string)x["City"],
-                PostCode = (string)x["PostCode"],
+                Address = IfNullInDatabase(x["Address"]),
+                City = IfNullInDatabase(x["City"]),
+                PostCode = IfNullInDatabase(x["PostCode"]),
                 Accounts = AccountManager.GetAccount((int)x["CustomerID"])
             }).ToList();
         }
@@ -50,6 +50,13 @@ namespace s3805825_a1.Managers
                 return DBNull.Value;
 
             return ob;
+        }
+
+        string IfNullInDatabase(object ob)
+        {
+            if (ob == DBNull.Value)
+                return string.Empty;
+            return ob.ToString();
         }
     }
 }

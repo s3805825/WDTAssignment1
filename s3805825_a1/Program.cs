@@ -20,7 +20,7 @@ namespace s3805825_a1
             var connectionString = configuration["ConnectionString"];
             DatabaseManager.CreateTables(connectionString);
             CustomerWebService.DataStoreProcess(connectionString);
-
+            new Menu(connectionString).run();
         }
 
         public static void MainZZ(String[] args)
@@ -97,7 +97,7 @@ namespace s3805825_a1
 
             foreach (var l in loginAcc)
             {
-                if (l.LoginID == Int32.Parse(accountNumber))
+                if (l.LoginID == accountNumber)
                 {
                     if (PBKDF2.Verify(l.PasswordHash, password))
                     {
