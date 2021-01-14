@@ -9,6 +9,7 @@ using SimpleHashing;
 using System.Linq;
 using s3805825_a1.Managers;
 using s3805825_a1.Services;
+using ConsoleTables;
 
 namespace s3805825_a1
 {
@@ -82,14 +83,6 @@ namespace s3805825_a1
         public int ValidLogin(String accountNumber, String password)
         {
 
-            //using var client = new HttpClient();
-            //var url = "https://coreteaching01.csit.rmit.edu.au/~e87149/wdt/services/logins/";
-            //var json = client.GetStringAsync(url).Result;
-
-            //var loginAcc = JsonConvert.DeserializeObject<List<LoginAccount>>(json);
-
-            
-
             foreach (var l in loginAccountManager.Logins)
             {
                 if (l.LoginID == accountNumber)
@@ -108,18 +101,6 @@ namespace s3805825_a1
         public Customer GetCustomer(int CustomerID)
         {
 
-
-            Customer customer = new Customer();
-            //using var client = new HttpClient();
-
-            //var url = "https://coreteaching01.csit.rmit.edu.au/~e87149/wdt/services/customers/";
-            //var json = client.GetStringAsync(url).Result;
-
-            //var customerList = JsonConvert.DeserializeObject<List<Customer>>(json, new JsonSerializerSettings
-            //{
-            //    DateFormatString = "dd/MM/yyyy HH:mm:ss aa"
-            //});
-
             foreach (var c in customerManager.Customers)
             {
                 if (CustomerID == c.CustomerID)
@@ -132,7 +113,8 @@ namespace s3805825_a1
         }
 
 
-        public static Boolean ShowMainMenu(Customer customer)
+
+        public Boolean ShowMainMenu(Customer customer)
         {
 
 
@@ -181,7 +163,7 @@ namespace s3805825_a1
 
         }
 
-        public static void ShowAtmMenu(Customer customer)
+        public void ShowAtmMenu(Customer customer)
         {
 
             while (true)
@@ -218,7 +200,7 @@ namespace s3805825_a1
 
         }
 
-        public static void ShowDepositMenu(Customer customer, Account acc)
+        public void ShowDepositMenu(Customer customer, Account acc)
         {
 
             while (true)
@@ -267,7 +249,7 @@ namespace s3805825_a1
                 var input = Console.ReadLine();
                 if (input == "") return;
                 Console.WriteLine();
-                if (!int.TryParse(input, out var option) || option < 0 || option > acc.Balance)
+                if (!double.TryParse(input, out var option) || option < 0)
                 {
                     Console.WriteLine("Invalid input.");
                     Console.WriteLine();
@@ -277,7 +259,10 @@ namespace s3805825_a1
                 {
                     Console.WriteLine("Withdraw of " + input + " is successful");
                     //Withdraw(customer, acc, int.Parse(input));
-                    customer.Withdraw(acc, int.Parse(input));
+                    if (!customer.Withdraw(acc, double.Parse(input)))
+                    {
+                        continue;
+                    }
                     Console.WriteLine("");
                     Console.WriteLine("Press any key to return to the account selection menu");
                     Console.ReadLine();
@@ -288,51 +273,78 @@ namespace s3805825_a1
 
         }
 
-        public static void ShowTransferMenu(Customer customer, Account acc)
+        public void ShowTransferMenu(Customer customer, Account acc)
         {
-
+            Console.Clear();
             while (true)
             {
-                var from = new Account();
-                foreach (var account in customer.Accounts)
-                {
-                    if (account != acc)
-                    {
-                        from = account;
-                    }
-                }
-                Console.Clear();
-                Console.WriteLine("---- Transfer Amount ----");
-                Console.WriteLine("");
-                Console.WriteLine("Your available balance is : " + from.Balance);
-                Console.WriteLine("");
-                Console.WriteLine("Enter the amount you would like to transfer to account " + acc.AccountNumber + ", or press enter to return: ");
 
-                var input = Console.ReadLine();
-                if (input == "") return;
-                Console.WriteLine();
-                if (!int.TryParse(input, out var option) || option < 0 || option > from.Balance)
+                
+                Console.WriteLine("---- Transfer Menu ----");
+                Console.WriteLine("");
+                Console.WriteLine("Enter the account number you wish to transfer to, or press enter to return to the account election menu:");
+
+                var transferToAcc = Console.ReadLine();
+                if (transferToAcc == "") return;
+                if (int.Parse(transferToAcc) == acc.AccountNumber)
                 {
-                    Console.WriteLine("Invalid input.");
-                    Console.WriteLine();
+                    Console.WriteLine("You should not transfer to the same account");
+                    continue;
+                }
+                if (!int.TryParse(transferToAcc, out var choice) || ExistTransferToAccount(int.Parse(transferToAcc)) == null)
+                {
+                    Console.WriteLine("Invalid input or This Account doesn't exist");
                     continue;
                 }
                 else
                 {
-                    Console.WriteLine("Please add a description(Optional) :");
-                    var des = Console.ReadLine();
-
-                    //TransferTo(customer, acc, int.Parse(input));
-                    customer.TransferTo(acc, int.Parse(input), des);
-                    Console.WriteLine("Transfer of " + input + " is successful");
+                    var to = ExistTransferToAccount(int.Parse(transferToAcc));
+                    Console.WriteLine("Your available balance is : " + acc.Balance);
                     Console.WriteLine("");
-                    Console.WriteLine("Press any key to return to the account selection menu");
-                    Console.ReadLine();
-                    return;
+                    Console.WriteLine("Enter the amount you would like to transfer to account " + to.AccountNumber + ", or press enter to return: ");
+                    var input = Console.ReadLine();
+                    if (input == "") return;
+                    Console.WriteLine();
+                    if (!double.TryParse(input, out var option) || option < 0)
+                    {
+                        Console.WriteLine("Invalid input.");
+                        Console.WriteLine();
+                        continue;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Please add a description(Optional) :");
+                        var des = Console.ReadLine();
 
+                        //TransferTo(customer, acc, int.Parse(input));
+                        if (!customer.TransferTo(acc, to, double.Parse(input), des)) continue;
+                        Console.WriteLine("Transfer of " + input + " is successful");
+                        Console.WriteLine("");
+                        Console.WriteLine("Press any key to return to the account selection menu");
+                        Console.ReadLine();
+                        return;
+
+                    }
                 }
+
+                
             }
 
+        }
+
+        Account ExistTransferToAccount(int AccNumber)
+        {
+            foreach (var c in customerManager.Customers)
+            {
+                foreach (var accc in c.Accounts)
+                {
+                    if (AccNumber == accc.AccountNumber)
+                    {
+                        return accc;                       
+                    }
+                }
+            }
+            return null;
         }
 
         public static void ShowDisplayMenu(Customer customer, Account acc)
@@ -342,23 +354,18 @@ namespace s3805825_a1
             {
                 Console.Clear();
                 Console.WriteLine("Account " + acc.AccountNumber + " - Current balance: $" + acc.Balance);
-                Console.WriteLine("");
-                Console.WriteLine(
-@"__________________________________________________________________________________________
-|Transaction Id|Type|From Account|To Account|   Amount|          Comment|              Date|
-|--------------|----|------------|----------|---------|-----------------|------------------|");
-                foreach (var b in acc.Transactions)
+                Console.WriteLine();
+
+                var table = new ConsoleTable("Transaction Id", "Type", "From Account", "To Account", "Amount", "Comment", "Date");
+                foreach (var trans in acc.Transactions)
                 {
-                    Console.WriteLine(
-@"|         {0}| {1}|          {2}|       {3}|      {4}|             {5}|{6}               |
-|--------------|----|------------|----------|---------|-----------------|------------------|
-", b.TransactionID, b.TransactionType, b.TransactionFrom, b.TransactionTo, b.Amount, b.Amount, b.TransactionTimeUtc);
+                    if (trans.TransactionTo == 0)
+                    {
+                        table.AddRow(trans.TransactionID, trans.TransactionType, trans.TransactionFrom, " ", trans.Amount, trans.Comment, trans.TransactionTimeUtc);
+                    }
+                    table.AddRow(trans.TransactionID, trans.TransactionType, trans.TransactionFrom, trans.TransactionTo, trans.Amount, trans.Comment, trans.TransactionTimeUtc);
                 }
-
-                Console.WriteLine(
-@"_________________________________________________________________________________________
-");
-
+                table.Write();
                 Console.WriteLine("Press enter to return");
                 Console.ReadLine();
                 return;
@@ -366,7 +373,7 @@ namespace s3805825_a1
 
         }
 
-        public static void SelectAccountMenu(int a, Customer customer)
+        public void SelectAccountMenu(int a, Customer customer)
         {
 
 
@@ -392,75 +399,207 @@ namespace s3805825_a1
                     Console.WriteLine("Select an Account to display statement for: ");
                 }
                 Console.WriteLine("");
+
                 Account s = customer.GetAccountByType("S");
                 Account c = customer.GetAccountByType("C");
-                Console.WriteLine("1. Savings Account " + s.AccountNumber);
-                Console.WriteLine("2. Checking Account " + c.AccountNumber);
-                Console.WriteLine("3. Return to Main Menu");
+                int limit = 3;
+                if (s == null)
+                {
+                    Console.WriteLine("1. Checking Account " + c.AccountNumber);
+                    Console.WriteLine("2. Return to Main Menu");
+                    limit = 2;
+                }
+                else if (c == null)
+                {
+                    Console.WriteLine("1. Savings Account " + s.AccountNumber);
+                    Console.WriteLine("2. Return to Main Menu");
+                    limit = 2;
+                }
+                else
+                {
+                    Console.WriteLine("1. Savings Account " + s.AccountNumber);
+                    Console.WriteLine("2. Checking Account " + c.AccountNumber);
+                    Console.WriteLine("3. Return to Main Menu");
+                }
+                
+                
                 var input = Console.ReadLine();
 
                 Console.WriteLine();
-                if (!int.TryParse(input, out var option) || option > 3 || option < 1)
+                if (!int.TryParse(input, out var option) || option > limit || option < 1)
                 {
                     Console.WriteLine("Invalid input.");
                     Console.WriteLine();
                     continue;
                 }
+
                 if (a == 1)
                 {
-                    switch (option)
+                    if (s == null)
                     {
-                        case 1:
-                            ShowDepositMenu(customer, s); return;
-                        case 2:
-                            ShowDepositMenu(customer, c); return;
-                        case 3:
-                            return;
-                        default:
-                            throw new InvalidOperationException();
+                        switch (option)
+                        {
+                            case 1:
+                                ShowDepositMenu(customer, c); return;
+                            case 2:
+                                return;
+                            default:
+                                throw new InvalidOperationException();
+                        }
                     }
+                    else if (c == null)
+                    {
+                        switch (option)
+                        {
+                            case 1:
+                                ShowDepositMenu(customer, s); return;
+                            case 2:
+                                return;
+                            default:
+                                throw new InvalidOperationException();
+                        }
+                    }
+                    else
+                    {
+                        switch (option)
+                        {
+                            case 1:
+                                ShowDepositMenu(customer, s); return;
+                            case 2:
+                                ShowDepositMenu(customer, c); return;
+                            case 3:
+                                return;
+                            default:
+                                throw new InvalidOperationException();
+                        }
+                    }
+                    
                 }
                 else if (a == 2)
                 {
-                    switch (option)
+                    if (s == null)
                     {
-                        case 1:
-                            ShowWithdrawMenu(customer, s); return;
-                        case 2:
-                            ShowWithdrawMenu(customer, c); return;
-                        case 3:
-                            return;
-                        default:
-                            throw new InvalidOperationException();
+                        switch (option)
+                        {
+                            case 1:
+                                ShowWithdrawMenu(customer, c); return;
+                            case 2:
+                                return;
+                            default:
+                                throw new InvalidOperationException();
+                        }
                     }
+                    else if (c == null)
+                    {
+                        switch (option)
+                        {
+                            case 1:
+                                ShowWithdrawMenu(customer, s); return;
+                            case 2:
+                                return;
+                            default:
+                                throw new InvalidOperationException();
+                        }
+                    }
+                    else
+                    {
+                        switch (option)
+                        {
+                            case 1:
+                                ShowWithdrawMenu(customer, s); return;
+                            case 2:
+                                ShowWithdrawMenu(customer, c); return;
+                            case 3:
+                                return;
+                            default:
+                                throw new InvalidOperationException();
+                        }
+                    }
+                    
                 }
                 else if (a == 3)
                 {
-                    switch (option)
+                    if (s == null)
                     {
-                        case 1:
-                            ShowTransferMenu(customer, c); return;
-                        case 2:
-                            ShowTransferMenu(customer, s); return;
-                        case 3:
-                            return;
-                        default:
-                            throw new InvalidOperationException();
+                        switch (option)
+                        {
+                            case 1:
+                                ShowTransferMenu(customer, c); return;
+                            case 2:
+                                return;
+                            default:
+                                throw new InvalidOperationException();
+                        }
                     }
+                    else if (c == null)
+                    {
+                        switch (option)
+                        {
+                            case 1:
+                                ShowTransferMenu(customer, s); return;
+                            case 2:
+                                return;
+                            default:
+                                throw new InvalidOperationException();
+                        }
+                    }
+                    else
+                    {
+                        switch (option)
+                        {
+                            case 1:
+                                ShowTransferMenu(customer, s); return;
+                            case 2:
+                                ShowTransferMenu(customer, c); return;
+                            case 3:
+                                return;
+                            default:
+                                throw new InvalidOperationException();
+                        }
+                    }
+                    
                 }
                 else if (a == 4)
                 {
-                    switch (option)
+                    if (s == null)
                     {
-                        case 1:
-                            ShowDisplayMenu(customer, s); return;
-                        case 2:
-                            ShowDisplayMenu(customer, c); return;
-                        case 3:
-                            return;
-                        default:
-                            throw new InvalidOperationException();
+                        switch (option)
+                        {
+                            case 1:
+                                ShowDisplayMenu(customer, c); return;
+                            case 2:
+                                return;
+                            default:
+                                throw new InvalidOperationException();
+                        }
                     }
+                    else if (c == null)
+                    {
+                        switch (option)
+                        {
+                            case 1:
+                                ShowDisplayMenu(customer, s); return;
+                            case 2:
+                                return;
+                            default:
+                                throw new InvalidOperationException();
+                        }
+                    }
+                    else
+                    {
+                        switch (option)
+                        {
+                            case 1:
+                                ShowDisplayMenu(customer, s); return;
+                            case 2:
+                                ShowDisplayMenu(customer, c); return;
+                            case 3:
+                                return;
+                            default:
+                                throw new InvalidOperationException();
+                        }
+                    }
+                    
                 }
 
             }
