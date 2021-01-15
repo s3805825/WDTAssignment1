@@ -18,3 +18,9 @@ so that the client does not have to know the details of the internal composition
 thus reducing the coupling between the client and the specific product.
 
 In my code, Getting transactions for the Account, Getting Accounts for Customers are sperated. This increase the complexity and security for clients to visit the code because the relation between each method and classes are complex.
+
+Explaination for Using Class Library
+It's easy to manage classes and it's easy for people to call classes, If we throw all the classes together, it's just a mess and we can't figure out what these class do.
+You can also run into problems with class names
+Classes that accomplish certain goals are "packaged" together to make it easier to manage.
+

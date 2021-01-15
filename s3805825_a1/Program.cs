@@ -15,6 +15,7 @@ namespace s3805825_a1
             DatabaseManager.CreateTables(connectionString);
             CustomerWebService.DataStoreProcess(connectionString);
             new Menu(connectionString).run();
+            DatabaseManager.DropTables(connectionString);
         }
     }
 }

@@ -165,17 +165,16 @@ namespace s3805825_a1
 
         public void ShowAtmMenu(Customer customer)
         {
-
+            Console.Clear();
+            Console.WriteLine("---- ATM Menu ----");
+            Console.WriteLine("");
+            Console.WriteLine("Please select an option from the following:");
+            Console.WriteLine("");
+            Console.WriteLine("1. Deposit Money");
+            Console.WriteLine("2. Withdraw Money");
+            Console.WriteLine("3. Return to Main Menu");
             while (true)
             {
-                Console.Clear();
-                Console.WriteLine("---- ATM Menu ----");
-                Console.WriteLine("");
-                Console.WriteLine("Please select an option from the following:");
-                Console.WriteLine("");
-                Console.WriteLine("1. Deposit Money");
-                Console.WriteLine("2. Withdraw Money");
-                Console.WriteLine("3. Return to Main Menu");
                 var input = Console.ReadLine();
                 Console.WriteLine();
                 if (!int.TryParse(input, out var option) || option > 3 || option < 1)
@@ -202,30 +201,29 @@ namespace s3805825_a1
 
         public void ShowDepositMenu(Customer customer, Account acc)
         {
-
+            Console.Clear();
+            Console.WriteLine("---- Deposit Amount ----");
+            Console.WriteLine("");
+            Console.WriteLine("Your available balance is : " + acc.Balance);
+            Console.WriteLine("");
+            Console.WriteLine("Enter the amount you would like to deposit, or press enter to return: ");
             while (true)
             {
-                Console.Clear();
-                Console.WriteLine("---- Deposit Amount ----");
-                Console.WriteLine("");
-                Console.WriteLine("Your available balance is : " + acc.Balance);
-                Console.WriteLine("");
-                Console.WriteLine("Enter the amount you would like to deposit, or press enter to return: ");
                 var input = Console.ReadLine();
                 if (input == "") return;
                 Console.WriteLine();
-                if (input == "") return;
-                if (!int.TryParse(input, out var option) || option < 0)
+                
+                if (!IsMoney(input)|| GetMoney(input) < 0)
                 {
-                    Console.WriteLine("Invalid input.");
+                    Console.WriteLine("Invalid input. Try Again or enter to quit");
                     Console.WriteLine();
                     continue;
                 }
                 else
                 {
                     Console.WriteLine("Deposit of " + input + " is successful");
-                    //Deposit(customer, acc, int.Parse(input));
-                    customer.Deposit(acc, int.Parse(input));
+                    
+                    customer.Deposit(acc, GetMoney(input),GetTransactionNumber());
                     Console.WriteLine("");
                     Console.WriteLine("Press any key to return to the account selection menu");
                     Console.ReadLine();
@@ -235,23 +233,51 @@ namespace s3805825_a1
 
         }
 
-        public static void ShowWithdrawMenu(Customer customer, Account acc)
+        public Boolean IsMoney(String s)
         {
+            if (!int.TryParse(s, out var option))
+            {
+                if (!double.TryParse(s, out var soption))
+                {
+                    return false;
+                }
+                
+            }
+            return true;
+        }
 
+        public double GetMoney(String s)
+        {
+            if (int.TryParse(s, out var option))
+            {
+                double vOut = Convert.ToDouble(s);
+                return vOut;
+            }
+            if (double.TryParse(s, out var soption))
+            {
+                return soption;
+            }
+            return 0.0;
+        }
+
+        public void ShowWithdrawMenu(Customer customer, Account acc)
+        {
+            Console.Clear();
+            Console.WriteLine("---- Withdraw Amount ----");
+            Console.WriteLine("");
+            Console.WriteLine("Your available balance is : " + acc.Balance);
+            Console.WriteLine("");
+            Console.WriteLine("Enter the amount you would like to withdraw, or press enter to return: ");
             while (true)
             {
-                Console.Clear();
-                Console.WriteLine("---- Withdraw Amount ----");
-                Console.WriteLine("");
-                Console.WriteLine("Your available balance is : " + acc.Balance);
-                Console.WriteLine("");
-                Console.WriteLine("Enter the amount you would like to withdraw, or press enter to return: ");
+                
+                
                 var input = Console.ReadLine();
                 if (input == "") return;
                 Console.WriteLine();
-                if (!double.TryParse(input, out var option) || option < 0)
+                if (!IsMoney(input) || GetMoney(input) < 0)
                 {
-                    Console.WriteLine("Invalid input.");
+                    Console.WriteLine("Invalid input, or press enter to return: ");
                     Console.WriteLine();
                     continue;
                 }
@@ -259,7 +285,7 @@ namespace s3805825_a1
                 {
                     Console.WriteLine("Withdraw of " + input + " is successful");
                     //Withdraw(customer, acc, int.Parse(input));
-                    if (!customer.Withdraw(acc, double.Parse(input)))
+                    if (!customer.Withdraw(acc, GetMoney(input),GetTransactionNumber()))
                     {
                         continue;
                     }
@@ -276,24 +302,25 @@ namespace s3805825_a1
         public void ShowTransferMenu(Customer customer, Account acc)
         {
             Console.Clear();
+            Console.WriteLine("---- Transfer Menu ----");
+            Console.WriteLine("");
+            Console.WriteLine("Enter the account number you wish to transfer to, or press enter to return to the account election menu:");
+
             while (true)
             {
 
                 
-                Console.WriteLine("---- Transfer Menu ----");
-                Console.WriteLine("");
-                Console.WriteLine("Enter the account number you wish to transfer to, or press enter to return to the account election menu:");
-
+                
                 var transferToAcc = Console.ReadLine();
                 if (transferToAcc == "") return;
                 if (int.Parse(transferToAcc) == acc.AccountNumber)
                 {
-                    Console.WriteLine("You should not transfer to the same account");
+                    Console.WriteLine("You should not transfer to the same account, or press enter to return: ");
                     continue;
                 }
                 if (!int.TryParse(transferToAcc, out var choice) || ExistTransferToAccount(int.Parse(transferToAcc)) == null)
                 {
-                    Console.WriteLine("Invalid input or This Account doesn't exist");
+                    Console.WriteLine("Invalid input or This Account doesn't exist, or press enter to return: ");
                     continue;
                 }
                 else
@@ -305,7 +332,7 @@ namespace s3805825_a1
                     var input = Console.ReadLine();
                     if (input == "") return;
                     Console.WriteLine();
-                    if (!double.TryParse(input, out var option) || option < 0)
+                    if (!IsMoney(input) || GetMoney(input) < 0)
                     {
                         Console.WriteLine("Invalid input.");
                         Console.WriteLine();
@@ -317,7 +344,7 @@ namespace s3805825_a1
                         var des = Console.ReadLine();
 
                         //TransferTo(customer, acc, int.Parse(input));
-                        if (!customer.TransferTo(acc, to, double.Parse(input), des)) continue;
+                        if (!customer.TransferTo(acc, to, GetMoney(input), des, GetTransactionNumber())) continue;
                         Console.WriteLine("Transfer of " + input + " is successful");
                         Console.WriteLine("");
                         Console.WriteLine("Press any key to return to the account selection menu");
@@ -363,7 +390,11 @@ namespace s3805825_a1
                     {
                         table.AddRow(trans.TransactionID, trans.TransactionType, trans.TransactionFrom, " ", trans.Amount, trans.Comment, trans.TransactionTimeUtc);
                     }
-                    table.AddRow(trans.TransactionID, trans.TransactionType, trans.TransactionFrom, trans.TransactionTo, trans.Amount, trans.Comment, trans.TransactionTimeUtc);
+                    else
+                    {
+                        table.AddRow(trans.TransactionID, trans.TransactionType, trans.TransactionFrom, trans.TransactionTo, trans.Amount, trans.Comment, trans.TransactionTimeUtc);
+                    }
+                    
                 }
                 table.Write();
                 Console.WriteLine("Press enter to return");
@@ -373,56 +404,70 @@ namespace s3805825_a1
 
         }
 
+        public int GetTransactionNumber()
+        {
+            int i = 0;
+            foreach (var c in customerManager.Customers)
+            {
+                foreach (var acc in c.Accounts)
+                {
+                    foreach (var t in acc.Transactions)
+                    {
+                        i++;
+                    }
+                }
+            }
+            return i;
+        }
+
         public void SelectAccountMenu(int a, Customer customer)
         {
+            Console.Clear();
+            Console.WriteLine("---- Select Account ----");
+            Console.WriteLine("");
+            if (a == 1)
+            {
+                Console.WriteLine("Select an Account to deposit money into: ");
+            }
+            else if (a == 2)
+            {
+                Console.WriteLine("Select an Account to Withdraw money from: ");
+            }
+            else if (a == 3)
+            {
+                Console.WriteLine("Select an Account to transfer money from: ");
+            }
+            else if (a == 4)
+            {
+                Console.WriteLine("Select an Account to display statement for: ");
+            }
+            Console.WriteLine("");
+            Account s = customer.GetAccountByType("S");
+            Account c = customer.GetAccountByType("C");
+            int limit = 3;
+            if (s == null)
+            {
+                Console.WriteLine("1. Checking Account " + c.AccountNumber);
+                Console.WriteLine("2. Return to Main Menu");
+                limit = 2;
+            }
+            else if (c == null)
+            {
+                Console.WriteLine("1. Savings Account " + s.AccountNumber);
+                Console.WriteLine("2. Return to Main Menu");
+                limit = 2;
+            }
+            else
+            {
+                Console.WriteLine("1. Savings Account " + s.AccountNumber);
+                Console.WriteLine("2. Checking Account " + c.AccountNumber);
+                Console.WriteLine("3. Return to Main Menu");
+            }
 
 
             while (true)
             {
-                Console.Clear();
-                Console.WriteLine("---- Select Account ----");
-                Console.WriteLine("");
-                if (a == 1)
-                {
-                    Console.WriteLine("Select an Account to deposit money into: ");
-                }
-                else if (a == 2)
-                {
-                    Console.WriteLine("Select an Account to Withdraw money from: ");
-                }
-                else if (a == 3)
-                {
-                    Console.WriteLine("Select an Account to transfer money from: ");
-                }
-                else if (a == 4)
-                {
-                    Console.WriteLine("Select an Account to display statement for: ");
-                }
-                Console.WriteLine("");
 
-                Account s = customer.GetAccountByType("S");
-                Account c = customer.GetAccountByType("C");
-                int limit = 3;
-                if (s == null)
-                {
-                    Console.WriteLine("1. Checking Account " + c.AccountNumber);
-                    Console.WriteLine("2. Return to Main Menu");
-                    limit = 2;
-                }
-                else if (c == null)
-                {
-                    Console.WriteLine("1. Savings Account " + s.AccountNumber);
-                    Console.WriteLine("2. Return to Main Menu");
-                    limit = 2;
-                }
-                else
-                {
-                    Console.WriteLine("1. Savings Account " + s.AccountNumber);
-                    Console.WriteLine("2. Checking Account " + c.AccountNumber);
-                    Console.WriteLine("3. Return to Main Menu");
-                }
-                
-                
                 var input = Console.ReadLine();
 
                 Console.WriteLine();

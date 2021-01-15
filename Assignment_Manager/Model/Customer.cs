@@ -30,18 +30,21 @@ namespace Assignment_Manager.Model
             return null;
         }
 
-        public void Deposit(Account acc, double amount)
+        public void Deposit(Account acc, double amount, int TransID)
         {
             foreach (var account in Accounts)
             {
                 if (acc == account)
                 {
+                    //Increase Account Balance
                     account.Balance += amount;
 
                     Transactions t = new Transactions();
+                    t.TransactionID = TransID;
+                    //Get Current Time
                     t.TransactionTimeUtc = DateTime.Now.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss tt");
                     t.Amount = amount;
-                    t.TransactionID = 1;
+                    
                     t.TransactionFrom = acc.AccountNumber;
                     t.TransactionType = "D";
                     t.Comment = "Deposit";
@@ -52,7 +55,7 @@ namespace Assignment_Manager.Model
 
         }
 
-        public Boolean Withdraw(Account acc, Double amount)
+        public Boolean Withdraw(Account acc, Double amount, int TransID)
         {
             double serviceFee = 0;
             
@@ -62,15 +65,17 @@ namespace Assignment_Manager.Model
             }
             if (acc.AccountType == "S" && acc.Balance - amount - serviceFee> 0 || acc.AccountType == "C" && acc.Balance - amount - serviceFee > 200)
             {
+                
                 foreach (var account in Accounts)
                 {
                     if (acc == account)
                     {
+                        
                         acc.Balance = acc.Balance - serviceFee - amount;
                         Transactions t = new Transactions();
                         t.TransactionTimeUtc = DateTime.Now.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss tt");
                         t.Amount = amount;
-                        t.TransactionID = 1;
+                        t.TransactionID = TransID;
                         t.TransactionFrom = acc.AccountNumber;
                         t.TransactionType = "W";
                         t.Comment = "Withdraw";
@@ -78,10 +83,20 @@ namespace Assignment_Manager.Model
 
                         if (FreeTransferAllowance < 1)
                         {
-                            t.Amount = 0.1;
-                            t.TransactionType = "S";
-                            t.Comment = "Withdraw Service Fee";
-                            account.Transactions.Add(t);
+                            Transactions service = new Transactions();
+                            service.TransactionID = TransID+1;
+                            //Requires the same time of withdraw
+                            service.Amount = 0.1;
+                            service.TransactionType = "S";
+                            service.TransactionFrom = acc.AccountNumber;
+                            service.TransactionTimeUtc = t.TransactionTimeUtc;
+                            service.Comment = "Withdraw Service Fee";
+                            account.Transactions.Add(service);
+                        }
+                        else
+                        {
+                            //Free allowance decrease when there's still allowance
+                            FreeTransferAllowance -= 1;
                         }
                         return true;
                     }
@@ -91,7 +106,7 @@ namespace Assignment_Manager.Model
             return false;
         }
 
-        public Boolean TransferTo(Account From, Account acc, Double amount, String des)
+        public Boolean TransferTo(Account From, Account acc, Double amount, String des, int TransID)
         {
             double serviceFee = 0;
 
@@ -101,11 +116,12 @@ namespace Assignment_Manager.Model
             }
             if (From.AccountType == "S" && From.Balance - amount - serviceFee > 0 || From.AccountType == "C" && From.Balance - amount - serviceFee > 200)
             {
+                
                 From.Balance = From.Balance - amount - serviceFee;
                 Transactions t = new Transactions();
                 t.TransactionTimeUtc = DateTime.Now.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss tt");
                 t.Amount = amount;
-                t.TransactionID = 1;
+                t.TransactionID = TransID;
                 t.TransactionFrom = From.AccountNumber;
                 t.TransactionTo = acc.AccountNumber;
                 t.TransactionType = "T";
@@ -118,10 +134,19 @@ namespace Assignment_Manager.Model
 
                 if (FreeTransferAllowance < 1)
                 {
-                    t.Amount = 0.1;
-                    t.TransactionType = "S";
-                    t.Comment = "Transfer Service Fee";
-                    From.Transactions.Add(t);
+                    Transactions service = new Transactions();
+                    service.TransactionID = TransID + 1;
+                    //Requires the same time of withdraw
+                    service.Amount = 0.1;
+                    service.TransactionType = "S";
+                    service.TransactionFrom = From.AccountNumber;
+                    service.TransactionTimeUtc = t.TransactionTimeUtc;
+                    service.Comment = "Withdraw Service Fee";
+                    From.Transactions.Add(service);
+                }
+                else
+                {
+                    FreeTransferAllowance -= 1;
                 }
                 Console.WriteLine("Transfer Successful");
                 return true;

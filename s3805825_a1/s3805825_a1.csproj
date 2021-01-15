@@ -17,6 +17,7 @@
   <ItemGroup>
     <None Include="bin\Debug\net5.0\appsettings.json" />
     <None Include="bin\Debug\net5.0\Sql\CreateTable.sql" />
+    <None Include="bin\Debug\net5.0\Sql\DropTable.sql" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Assignment_Manager\Assignment_Manager.csproj" />
