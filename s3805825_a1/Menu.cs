@@ -2,14 +2,14 @@
 using System.Net.Http;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using s3805825_a1.Model;
+using Assignment_Manager.Model;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using SimpleHashing;
 using System.Linq;
-using s3805825_a1.Managers;
-using s3805825_a1.Services;
+using Assignment_Manager.Services;
 using ConsoleTables;
+using Assignment_Manager.Managers;
 
 namespace s3805825_a1
 {

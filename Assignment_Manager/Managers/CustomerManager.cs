@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using s3805825_a1.Model;
-using s3805825_a1.Utilities;
+using Assignment_Manager.Model;
+using Assignment_Manager.Utilities;
 
-namespace s3805825_a1.Managers
+namespace Assignment_Manager.Managers
 {
     public class CustomerManager
     {

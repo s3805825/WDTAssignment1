@@ -1,7 +1,7 @@
 ﻿using System.IO;
-using s3805825_a1.Utilities;
+using Assignment_Manager.Utilities;
 
-namespace s3805825_a1.Managers
+namespace Assignment_Manager.Managers
 {
     public static class DatabaseManager
     {
