@@ -12,9 +12,12 @@ namespace s3805825_a1
         {
             var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
             var connectionString = configuration["ConnectionString"];
+            //create table first
             DatabaseManager.CreateTables(connectionString);
+            //get data from database and insert into memory
             CustomerWebService.DataStoreProcess(connectionString);
             new Menu(connectionString).run();
+            //drop table from database 
             DatabaseManager.DropTables(connectionString);
         }
     }

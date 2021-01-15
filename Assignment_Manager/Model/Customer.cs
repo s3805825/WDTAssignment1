@@ -18,14 +18,12 @@ namespace Assignment_Manager.Model
             FreeTransferAllowance = 4;
         }
 
-        public static Account GetAccountByType(String type, Customer customer)
+        public Account GetAccountByType(string s)
         {
-            foreach (var acc in customer.Accounts)
+            foreach (var acc in Accounts)
             {
-                if (type == acc.AccountType)
-                {
+                if (acc.AccountType == s)
                     return acc;
-                }
             }
             return null;
         }
@@ -58,7 +56,7 @@ namespace Assignment_Manager.Model
         public Boolean Withdraw(Account acc, Double amount, int TransID)
         {
             double serviceFee = 0;
-            
+            //if the free allowance is used, service fee will be charged
             if (FreeTransferAllowance < 1)
             {
                 serviceFee = 0.1;
@@ -80,7 +78,7 @@ namespace Assignment_Manager.Model
                         t.TransactionType = "W";
                         t.Comment = "Withdraw";
                         account.Transactions.Add(t);
-
+                        //service transaction recorded
                         if (FreeTransferAllowance < 1)
                         {
                             Transactions service = new Transactions();
@@ -114,6 +112,7 @@ namespace Assignment_Manager.Model
             {
                 serviceFee = 0.2;
             }
+            //check is balance is allowed.
             if (From.AccountType == "S" && From.Balance - amount - serviceFee > 0 || From.AccountType == "C" && From.Balance - amount - serviceFee > 200)
             {
                 
@@ -127,9 +126,7 @@ namespace Assignment_Manager.Model
                 t.TransactionType = "T";
                 t.Comment = des;
                 From.Transactions.Add(t);
-
                 acc.Balance += amount;
-
                 acc.Transactions.Add(t);
 
                 if (FreeTransferAllowance < 1)
@@ -157,17 +154,6 @@ namespace Assignment_Manager.Model
 
         }
 
-        public Account GetAccountByType(String type)
-        {
-            foreach (var acc in Accounts)
-            {
-                if (type == acc.AccountType)
-                {
-                    return acc;
-                }
-            }
-            return null;
-        }
     }
 }
 

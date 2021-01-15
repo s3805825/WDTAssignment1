@@ -79,7 +79,8 @@ namespace s3805825_a1
             return cusId;
 
         }
-
+        //check user existence
+        //if return 0 means not exist
         public int ValidLogin(String accountNumber, String password)
         {
 
@@ -97,7 +98,7 @@ namespace s3805825_a1
 
             return 0;
         }
-
+        //get customer from memory
         public Customer GetCustomer(int CustomerID)
         {
 
@@ -134,6 +135,7 @@ namespace s3805825_a1
                 Console.WriteLine("5. Exit");
                 var input = Console.ReadLine();
                 Console.WriteLine();
+                //check if input is int and within range
                 if (!int.TryParse(input, out var option) || option > 5 || option < 1)
                 {
                     Console.WriteLine("Invalid input.");
